@@ -53,7 +53,13 @@ sub('''<h3>Donner l'accès</h3><p class="small">Partagez le lien de l'applicatio
     '''<h3>Donner l'accès</h3><p class="small">Envoyez l'adresse de l'application (<b>${esc(location.origin)}/app/</b>) aux dirigeants. Chaque appareil reçoit automatiquement un accès personnel : le dirigeant y crée et modifie uniquement la fiche de son club (catégories, staff, joueurs, photos et PDF), et consulte les compétitions. Il doit garder le même téléphone ou ordinateur pour modifier son club ensuite ; sinon, il passe par le lien d'inscription de la compétition. L'administration s'ouvre avec le mot de passe administrateur, sur n'importe quel appareil. Les PDF des pièces ne sont lisibles que par l'administration et le club concerné.</p>''')
 
 # 7) Titre de l'onglet
-h = h.replace('<title>NARX Foot Manager</title>', '<title>NARX Foot Manager · Application</title>\n<link rel="manifest" href="/app/manifest.webmanifest">\n<link rel="icon" href="/favicon.png">\n<link rel="apple-touch-icon" href="/icon-192.png">', 1)
+h = h.replace('<title>NARX Foot Manager</title>', '<title>NARX Foot Manager · Application</title>\n<link rel="manifest" href="/app/manifest.webmanifest">\n<link rel="icon" href="/favicon.png">\n<link rel="apple-touch-icon" href="/apple-touch-icon.png">\n'
+    '<meta name="apple-mobile-web-app-capable" content="yes">\n<meta name="mobile-web-app-capable" content="yes">\n'
+    '<meta name="apple-mobile-web-app-status-bar-style" content="black">\n<meta name="apple-mobile-web-app-title" content="NARX Foot">', 1)
+
+# 8) Installation (iPhone, Android, ordinateur) : service worker pour l'ouverture hors connexion
+if not test:
+    h = h.replace('</body>', '<script>if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("/app/sw.js",{scope:"/app/"}).catch(()=>{}));</script>\n</body>', 1)
 assert 'NARX_FB' in h
 open(out, 'w').write(h)
 print('ok', out, len(h))

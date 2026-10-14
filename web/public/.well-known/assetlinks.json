@@ -1,0 +1,8 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "tg.narx.footmanager",
+    "sha256_cert_fingerprints": ["8E:02:CE:10:AA:02:19:C0:A2:06:27:76:91:A2:21:69:82:D9:43:F0:4B:C0:FD:C1:3A:5E:36:A4:CE:A5:4D:07"]
+  }
+}]

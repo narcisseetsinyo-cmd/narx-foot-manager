@@ -84,4 +84,4 @@ Si une croix rouge apparaît, ouvrez le lancement et envoyez le message d'erreur
 
 - **Dirigeants** : chaque téléphone ou ordinateur reçoit automatiquement un accès personnel. Un dirigeant modifie son club depuis le même appareil ; s'il change d'appareil, il passe par le lien d'inscription de la compétition.
 - **Offre gratuite (Spark)** : 1 Go de données, 50 000 lectures et 20 000 écritures par jour, largement suffisant pour quelques compétitions.
-- **Installer sur téléphone** : ouvrez `/app/` dans Chrome (Android) ou Safari (iPhone) → menu → **Ajouter à l'écran d'accueil**.
+- **Installer sur les appareils** : voir [INSTALLATION.md](INSTALLATION.md).

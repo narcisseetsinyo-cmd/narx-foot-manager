@@ -1,7 +1,7 @@
 {
   "name": "narx-foot-manager",
   "productName": "NARX Foot Manager",
-  "version": "3.10.0",
+  "version": "3.11.0",
   "description": "NARX Foot Manager – gestion de tournois et championnats de football",
   "author": "NARX",
   "main": "main.js",

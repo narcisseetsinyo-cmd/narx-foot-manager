@@ -1,13 +1,14 @@
 # NARX Foot Manager
 
 Gestion de tournois et de championnats de football : inscriptions des clubs en ligne, tirage au sort des poules, feuilles de match, classements, suspensions, licences 6 × 4 cm et visuels pour les réseaux sociaux.
-Version **3.10.0** – thème « Nuit bleue ».
+Version **3.11.0** – thème « Nuit bleue ».
 
 ## Contenu du dépôt
 
 | Dossier | Contenu |
 |---|---|
-| `desktop/` | Application Windows et Mac (Electron). |
+| `desktop/` | Application Windows et Mac (Electron) : affiche les données partagées en ligne, avec un mode « données de cet ordinateur ». |
+| `android/` | Application Android (Trusted Web Activity) ; clé de signature `narx-release.jks` (à conserver, nécessaire aux mises à jour). |
 | `web/public/` | Site publié sur Firebase Hosting : site de présentation (`/`) et application en ligne (`/app/`). |
 | `web/src/firebase-adapter.js` | Branchement de l'application sur Firebase (Firestore + Authentication). |
 | `web/claude/` | Version en ligne d'origine (Claude), source de la version Firebase. |
@@ -20,9 +21,11 @@ Version **3.10.0** – thème « Nuit bleue ».
 
 Suivez **[docs/GUIDE-FIREBASE.md](docs/GUIDE-FIREBASE.md)**. Une fois configuré, chaque envoi sur la branche `main` publie automatiquement le site (workflow *Déployer sur Firebase*).
 
-## Fabriquer les installateurs Windows et Mac
+## Fabriquer les applications à installer
 
-Onglet **Actions → Applications Windows et Mac → Run workflow**. Après quelques minutes, les fichiers `.exe` (Windows), `.dmg` et `.zip` (Mac, puce Apple et Intel) se téléchargent en bas de la page du lancement, rubrique **Artifacts**.
+Onglet **Actions → Applications (Windows, Mac, Android) → Run workflow**. Après environ 15 minutes, la page **Releases** du dépôt contient l'installateur Windows (.exe), les .dmg Mac (puce Apple et Intel) et l'APK Android ; l'APK est aussi publié sur le site (`/telecharger/NARX-Foot-Manager.apk`). Mode d'emploi : [docs/INSTALLATION.md](docs/INSTALLATION.md).
+
+iPhone et iPad : pas de fichier, l'application s'installe depuis Safari (Partager → Sur l'écran d'accueil).
 
 En local :
 

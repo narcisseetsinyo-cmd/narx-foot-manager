@@ -1,0 +1,32 @@
+plugins { id "com.android.application" }
+
+def ks = new Properties()
+ks.load(new FileInputStream(rootProject.file("keystore.properties")))
+
+android {
+    namespace "tg.narx.footmanager"
+    compileSdk 34
+    defaultConfig {
+        applicationId "tg.narx.footmanager"
+        minSdk 21
+        targetSdk 34
+        versionCode 1
+        versionName "3.11.0"
+    }
+    signingConfigs {
+        release {
+            storeFile rootProject.file(ks["storeFile"])
+            storePassword ks["storePassword"]
+            keyAlias ks["keyAlias"]
+            keyPassword ks["keyPassword"]
+        }
+    }
+    buildTypes {
+        release { minifyEnabled false; signingConfig signingConfigs.release }
+    }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+}
+
+dependencies {
+    implementation "com.google.androidbrowserhelper:androidbrowserhelper:2.5.0"
+}

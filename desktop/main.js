@@ -3,16 +3,17 @@ const path = require("path");
 const fs = require("fs");
 
 const dataFile = () => path.join(app.getPath("userData"), "golden-generation-cup-data.json");
+const ONLINE_URL = process.env.NARX_URL || "https://narx-foot-manager.web.app/app/";
+const ONLINE_ORIGIN = new URL(ONLINE_URL).origin;
+const prefsFile = () => path.join(app.getPath("userData"), "preferences.json");
+const readPrefs = () => { try { return JSON.parse(fs.readFileSync(prefsFile(), "utf8")); } catch (e) { return {}; } };
+const writePrefs = p => { try { fs.mkdirSync(path.dirname(prefsFile()), { recursive: true }); fs.writeFileSync(prefsFile(), JSON.stringify(p)); } catch (e) {} };
+// "online" : données partagées (Firebase), comme le site et les téléphones. "local" : données de cet ordinateur.
+let mode = readPrefs().mode === "local" ? "local" : "online";
 let win;
 const refocus = () => { if (win && !win.isDestroyed()) { win.focus(); win.webContents.focus(); } };
 
-function createWindow() {
-  win = new BrowserWindow({
-    width: 1280, height: 820, minWidth: 380, minHeight: 600,
-    backgroundColor: "#010C34", title: "NARX Foot Manager",
-    icon: path.join(__dirname, "app", process.platform === "win32" ? "icon.ico" : "icon.png"),
-    webPreferences: { preload: path.join(__dirname, "preload.js"), contextIsolation: true, nodeIntegration: false, sandbox: true }
-  });
+function buildMenu() {
   const isMac = process.platform === "darwin";
   Menu.setApplicationMenu(Menu.buildFromTemplate([
     ...(isMac ? [{ label: "NARX Foot Manager", submenu: [
@@ -20,7 +21,11 @@ function createWindow() {
       { role: "hide", label: "Masquer NARX Foot Manager" }, { role: "hideOthers", label: "Masquer les autres" }, { role: "unhide", label: "Tout afficher" },
       { type: "separator" }, { role: "quit", label: "Quitter NARX Foot Manager" } ] }] : []),
     { label: "Fichier", submenu: [
-      { label: "Ouvrir le dossier des données", click: () => shell.openPath(app.getPath("userData")) },
+      { label: "Données partagées (en ligne)", type: "radio", checked: mode === "online", click: () => setMode("online") },
+      { label: "Données de cet ordinateur (hors connexion)", type: "radio", checked: mode === "local", click: () => setMode("local") },
+      { type: "separator" },
+      { label: "Ouvrir le site NARX Foot Manager", click: () => shell.openExternal(ONLINE_ORIGIN + "/") },
+      { label: "Ouvrir le dossier des données de cet ordinateur", click: () => shell.openPath(app.getPath("userData")) },
       ...(isMac ? [{ type: "separator" }, { role: "close", label: "Fermer la fenêtre" }] : [{ type: "separator" }, { role: "quit", label: "Quitter" }]) ] },
     { label: "Édition", submenu: [
       { role: "undo", label: "Annuler" }, { role: "redo", label: "Rétablir" }, { type: "separator" },
@@ -30,8 +35,44 @@ function createWindow() {
       { role: "reload", label: "Actualiser" }, { role: "togglefullscreen", label: "Plein écran" },
       { role: "zoomIn", label: "Zoom avant" }, { role: "zoomOut", label: "Zoom arrière" }, { role: "resetZoom", label: "Taille réelle" } ] }
   ]));
-  win.loadFile(path.join(__dirname, "app", "index.html"));
-  win.webContents.setWindowOpenHandler(({ url }) => { shell.openExternal(url); return { action: "deny" }; });
+}
+
+function setMode(m) {
+  if (m === mode) return;
+  mode = m; writePrefs({ ...readPrefs(), mode });
+  const old = win; createWindow(old ? old.getBounds() : null); if (old && !old.isDestroyed()) old.destroy();
+}
+
+function createWindow(bounds) {
+  const online = mode === "online";
+  win = new BrowserWindow({
+    ...(bounds || { width: 1280, height: 820 }), minWidth: 380, minHeight: 600,
+    backgroundColor: "#0A1330", title: "NARX Foot Manager",
+    icon: path.join(__dirname, "app", process.platform === "win32" ? "icon.ico" : "icon.png"),
+    // En ligne : aucune passerelle vers l'ordinateur n'est donnée au site (sécurité).
+    webPreferences: online ? { contextIsolation: true, nodeIntegration: false, sandbox: true }
+                           : { preload: path.join(__dirname, "preload.js"), contextIsolation: true, nodeIntegration: false, sandbox: true }
+  });
+  buildMenu();
+  const w = win;
+  if (online) {
+    w.loadURL(ONLINE_URL);
+    w.webContents.on("did-fail-load", (_e, code, _d, url, isMain) => {
+      if (isMain && code !== -3 && !String(url).startsWith("file:")) w.loadFile(path.join(__dirname, "app", "hors-ligne.html"));
+    });
+    // Liens « narx: » de la page hors ligne
+    w.webContents.on("will-navigate", (e, url) => {
+      if (url.startsWith("narx:")) { e.preventDefault(); if (url.includes("local")) setMode("local"); else w.loadURL(ONLINE_URL); return; }
+      if (!url.startsWith(ONLINE_ORIGIN) && !url.startsWith("file:")) { e.preventDefault(); shell.openExternal(url); }
+    });
+  } else {
+    w.loadFile(path.join(__dirname, "app", "index.html"));
+  }
+  w.webContents.setWindowOpenHandler(({ url }) => {
+    if (url.startsWith("blob:")) return { action: "allow" };
+    if (/^https?:/.test(url)) shell.openExternal(url);
+    return { action: "deny" };
+  });
 }
 
 ipcMain.handle("store:load", () => {
