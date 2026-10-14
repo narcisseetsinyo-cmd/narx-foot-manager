@@ -1,6 +1,6 @@
 # Publie le site (web/public) et les règles Firestore sur Firebase à chaque envoi sur « main ».
 # Réglages nécessaires dans GitHub → Settings → Secrets and variables → Actions :
-#   - Variable FIREBASE_PROJECT_ID : identifiant du projet Firebase (ex. narx-foot-manager)
+#   - (facultatif) Variable FIREBASE_PROJECT_ID : sinon l'identifiant de .firebaserc est utilisé
 #   - Secret   FIREBASE_SERVICE_ACCOUNT : contenu complet du fichier JSON du compte de service
 name: Déployer sur Firebase
 on:
@@ -19,8 +19,10 @@ jobs:
           SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           PID: ${{ vars.FIREBASE_PROJECT_ID }}
         run: |
+          if [ -z "$PID" ]; then PID=$(python3 -c "import json;print(json.load(open('.firebaserc'))['projects']['default'])"); fi
+          echo "pid=$PID" >> "$GITHUB_OUTPUT"
           if [ -z "$SA" ] || [ -z "$PID" ]; then
-            echo "::warning::Déploiement ignoré : ajoutez la variable FIREBASE_PROJECT_ID et le secret FIREBASE_SERVICE_ACCOUNT (voir docs/GUIDE-FIREBASE.md)."
+            echo "::warning::Déploiement ignoré : ajoutez le secret FIREBASE_SERVICE_ACCOUNT (voir docs/GUIDE-FIREBASE.md)."
             echo "ok=0" >> "$GITHUB_OUTPUT"
           else
             printf '%s' "$SA" > "$RUNNER_TEMP/sa.json"
@@ -34,5 +36,5 @@ jobs:
         if: steps.cfg.outputs.ok == '1'
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/sa.json
-          PID: ${{ vars.FIREBASE_PROJECT_ID }}
+          PID: ${{ steps.cfg.outputs.pid }}
         run: npx --yes firebase-tools@13 deploy --only hosting,firestore:rules --project "$PID" --non-interactive

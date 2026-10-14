@@ -61,9 +61,7 @@ Dans le dépôt <https://github.com/narcisseetsinyo-cmd/narx-foot-manager> :
 2. Onglet **Secrets** → **New repository secret** :
    - Name : `FIREBASE_SERVICE_ACCOUNT`
    - Secret : ouvrez le fichier `.json` téléchargé (avec TextEdit ou le Bloc-notes), copiez **tout** son contenu et collez-le ici → Add secret.
-3. Onglet **Variables** → **New repository variable** :
-   - Name : `FIREBASE_PROJECT_ID`
-   - Value : l'identifiant du projet noté à l'étape 1 → Add variable.
+3. (L'identifiant du projet, `narx-foot-manager`, est déjà inscrit dans le fichier `.firebaserc`.)
 4. Vous pouvez ensuite supprimer le fichier `.json` de votre ordinateur.
 
 ## 7. Publier
