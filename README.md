@@ -23,7 +23,7 @@ Suivez **[docs/GUIDE-FIREBASE.md](docs/GUIDE-FIREBASE.md)**. Une fois configuré
 
 ## Fabriquer les applications à installer
 
-Onglet **Actions → Applications (Windows, Mac, Android) → Run workflow**. Après environ 15 minutes, la page **Releases** du dépôt contient l'installateur Windows (.exe), les .dmg Mac (puce Apple et Intel) et l'APK Android . Pour mettre à jour l'APK du site, copiez-le dans `web/public/telecharger/` et envoyez-le sur `main`. Mode d'emploi : [docs/INSTALLATION.md](docs/INSTALLATION.md).
+Onglet **Actions → Applications (Windows, Mac, Android) → Run workflow**. Après environ 15 minutes, la page **Releases** du dépôt contient l'installateur Windows (.exe), les .dmg Mac (puce Apple et Intel) et l'APK Android . L'offre gratuite de Firebase n'accepte pas les fichiers .apk/.exe/.dmg : ils se partagent depuis Releases (ou par WhatsApp, e-mail…). Mode d'emploi : [docs/INSTALLATION.md](docs/INSTALLATION.md).
 
 iPhone et iPad : pas de fichier, l'application s'installe depuis Safari (Partager → Sur l'écran d'accueil).
 

@@ -7,7 +7,7 @@ Toutes les applications partagent les mêmes données que le site **https://narx
 | **Windows** 10 et 11 | `NARX-Foot-Manager-Setup-3.11.0.exe` | Double-cliquez. Si « Windows a protégé votre ordinateur » : **Informations complémentaires → Exécuter quand même**. |
 | **Mac Intel** | `NARX-Foot-Manager-3.11.0-mac-x64.dmg` | Ouvrez le .dmg, glissez l'icône dans **Applications**. Premier lancement : **clic droit → Ouvrir → Ouvrir** (ou Réglages Système → Confidentialité et sécurité → **Ouvrir quand même**). |
 | **Mac puce Apple** (M1 à M4) | `NARX-Foot-Manager-3.11.0-mac-arm64.dmg` | Comme ci-dessus. |
-| **Android** | `NARX-Foot-Manager.apk` (aussi sur https://narx-foot-manager.web.app/telecharger/NARX-Foot-Manager.apk) | Ouvrez le fichier sur le téléphone → **Paramètres → Autoriser cette source** → Installer. |
+| **Android** | `NARX-Foot-Manager.apk` | Ouvrez le fichier sur le téléphone → **Paramètres → Autoriser cette source** → Installer. Sans le fichier : ouvrez l'adresse dans **Chrome** → menu **⋮** → **Installer l'application**. |
 | **iPhone / iPad** | Safari, aucun fichier | Ouvrez https://narx-foot-manager.web.app/app/ dans **Safari** → **Partager** → **Sur l'écran d'accueil** → Ajouter. |
 
 ## Administration et dirigeants

@@ -1,7 +1,7 @@
 # Fabrique toutes les applications à installer et les publie dans « Releases » du dépôt :
 #   - Windows : NARX-Foot-Manager-Setup-<version>.exe
 #   - Mac     : .dmg (puce Apple « arm64 » et Intel « x64 »)
-#   - Android : NARX-Foot-Manager.apk (pour le site : le copier dans web/public/telecharger/ puis l'envoyer sur main)
+#   - Android : NARX-Foot-Manager.apk (Firebase gratuit refuse les .apk : à partager depuis Releases)
 # Lancement : onglet Actions → « Applications (Windows, Mac, Android) » → Run workflow.
 name: Applications (Windows, Mac, Android)
 on:
