@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--night:#021A62;--deep:#010C34;--royal:#0A3FA8;--gold:#F2B400;--gold2:#FBE25B;--ice:#E6ECFF;--muted:#A9B8E3;--line:rgba(169,184,227,.25);--card:#0A2470;--card2:#0D2C85;--ok:#3DDC97;--bad:#FF6B6B}
+*{box-sizing:border-box}
+body{margin:0;background:var(--deep);background-image:radial-gradient(900px 500px at 110% -10%,rgba(10,63,168,.7),transparent 60%);color:#fff;font-family:Barlow,Arial,sans-serif;font-size:15px;line-height:1.45}
+h1,h2,h3{font-family:"Barlow Condensed",Arial,sans-serif;margin:0}
+h1{font-size:30px}h2{font-size:22px;color:var(--gold)}h3{font-size:18px}
+.wrap{max-width:860px;margin:0 auto;padding:20px 16px 120px}
+.hero{display:flex;align-items:center;gap:14px;margin-bottom:6px}
+.star{width:46px;height:46px;flex:none}
+.muted{color:var(--muted)}.small{font-size:13px}
+.panel{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:16px;padding:16px;margin:16px 0}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr))}
+.f{display:grid;gap:4px}
+label{font-size:13px;color:var(--muted);font-weight:500}
+input,select{font:inherit;color:#fff;background:rgba(1,12,52,.65);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%}
+input:focus,select:focus{outline:none;border-color:var(--gold)}
+input[type=color]{height:44px;padding:4px}
+.btn{font:inherit;border:0;border-radius:10px;padding:11px 18px;font-weight:600;cursor:pointer;background:var(--gold);color:var(--night)}
+.btn:hover{background:var(--gold2)}.btn.ghost{background:transparent;color:var(--ice);border:1px solid var(--line)}.btn.danger{background:transparent;color:var(--bad);border:1px solid rgba(255,107,107,.5)}
+.btn.sm{padding:7px 12px;font-size:13px}.btn:disabled{opacity:.5;cursor:not-allowed}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.person{border:1px solid var(--line);border-radius:14px;padding:12px;background:rgba(1,12,52,.4)}
+.person h3{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px}
+.pic{display:flex;align-items:center;gap:12px}
+.thumb{width:64px;height:64px;border-radius:50%;background:var(--royal);display:grid;place-items:center;overflow:hidden;flex:none;border:2px solid rgba(242,180,0,.5);color:var(--gold2);font-weight:700}
+.thumb.sq{border-radius:14px;background:#fff;color:var(--night)}
+.thumb img{width:100%;height:100%;object-fit:cover}.thumb.sq img{object-fit:contain}
+.chip{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;background:rgba(169,184,227,.15)}
+.chip.ok{background:rgba(61,220,151,.15);color:var(--ok)}.chip.bad{background:rgba(255,107,107,.15);color:var(--bad)}.chip.gold{background:rgba(242,180,0,.18);color:var(--gold2)}
+.bar{position:fixed;left:0;right:0;bottom:0;background:rgba(1,12,52,.96);border-top:1px solid var(--line);padding:12px 16px;z-index:5}
+.bar .in{max-width:860px;margin:0 auto;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.notice{padding:12px 14px;border-radius:12px;background:rgba(242,180,0,.12);border:1px solid rgba(242,180,0,.4);color:var(--gold2);margin:12px 0}
+.err{background:rgba(255,107,107,.12);border-color:rgba(255,107,107,.45);color:#ffb3b3}
+.code{font-family:"Barlow Condensed",sans-serif;font-size:42px;letter-spacing:6px;color:var(--gold);text-align:center;background:var(--deep);border:1px dashed var(--gold);border-radius:14px;padding:10px;margin:10px 0}
+.progress{height:8px;border-radius:8px;background:rgba(169,184,227,.2);overflow:hidden;flex:1;min-width:160px}.progress div{height:100%;background:var(--gold);width:0;transition:width .3s}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero"><svg class="star" viewBox="0 0 24 24"><path fill="#F2B400" d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7L12 17.3 5.8 21l1.6-7L2 9.2l7.1-.6z"/></svg>
+    <div><h1 id="ttl">Inscription des clubs</h1><div class="muted" id="sub"></div></div></div>
+  <div id="app"><p class="muted">Chargement…</p></div>
+</div>
+<div class="bar hidden" id="bar"><div class="in"><div class="progress"><div id="prog"></div></div><span class="small muted" id="progtxt"></span><button class="btn" id="send">Envoyer l'inscription</button></div></div>
+<script>
+"use strict";
+const run=(fn,...a)=>new Promise((res,rej)=>google.script.run.withSuccessHandler(res).withFailureHandler(rej)[fn](...a));
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const rid=()=>Math.random().toString(36).slice(2,10)+Date.now().toString(36);
+const ini=s=>(s||"").split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0]).join("").toUpperCase();
+const POSTES=["Gardien","Défenseur","Milieu","Attaquant"];
+const DEF_CATS=["U11","U13","U15","U17","U19","U20","U21","U23","U25","Seniors","Vétérans","Féminines","Autre"];
+window.addEventListener("error",ev=>{const a=document.getElementById("app");if(a&&/Chargement/.test(a.textContent))a.innerHTML=`<div class="notice err">Le formulaire n'a pas pu démarrer (${esc(ev.message||"erreur")}). Prévenez l'organisation.</div>`});
+window.addEventListener("unhandledrejection",ev=>{const a=document.getElementById("app");if(a&&/Chargement/.test(a.textContent))a.innerHTML=`<div class="notice err">Le formulaire n'a pas pu démarrer (${esc((ev.reason&&ev.reason.message)||"erreur")}). Prévenez l'organisation.</div>`});
+let CFG=null,CODE=null,P={},CAT="";
+const getLoc=()=>new Promise(res=>{try{google.script.url.getLocation(l=>res((l&&l.parameter)||{}))}catch(e){res({})}});
+const D={club:{couleur:"#F2B400"},staff:[{},{},{},{},{}],players:[]};
+const FILES={}; // clé -> File en attente
+const THUMB={}; // clé -> URL d'aperçu
+
+function fileKey(kind,i){return kind+":"+i}
+function eligibility(d){if(!d)return["Date manquante",""];if(CFG.birthMin&&d<CFG.birthMin)return["Non éligible (trop âgé)","bad"];if(CFG.birthMax&&d>CFG.birthMax)return["Non éligible (trop jeune)","bad"];return["Éligible","ok"]}
+const fmt=d=>d?d.split("-").reverse().join("/"):"";
+
+async function init(){
+  try{CFG=await Promise.race([run("getConfig"),new Promise((_,rej)=>setTimeout(()=>rej(new Error("délai dépassé")),25000))])}catch(e){return fatal("Le formulaire est momentanément indisponible. Réessayez dans quelques instants.")}
+  if(!CFG)return fatal("Le formulaire est momentanément indisponible.");
+  if(!Array.isArray(CFG.cats)){CFG.cats=DEF_CATS;CFG.oldServer=true}
+  const loc=await getLoc();const ok=v=>typeof v==="string";const D=/^\d{4}-\d{2}-\d{2}$/;
+  if(ok(loc.comp)&&/^[A-Za-z0-9_-]{1,40}$/.test(loc.comp)){P={id:loc.comp,sid:/^[A-Za-z0-9_-]{20,}$/.test(loc.sid||"")?loc.sid:"",nom:String(loc.nom||"Compétition").slice(0,70),bmin:D.test(loc.min||"")?loc.min:"",bmax:D.test(loc.max||"")?loc.max:"",k:CFG.cats.includes(loc.cat)?loc.cat:""};
+    CAT=P.k||"";CFG.birthMin=P.bmin;CFG.birthMax=P.bmax}
+  document.getElementById("ttl").textContent=P.id?P.nom:"Inscription des clubs";document.getElementById("sub").textContent=P.id?`Inscription des clubs${P.k?" · Catégorie "+P.k:""}`:"Formulaire d'inscription";document.title=P.id?`${P.nom}${P.k?" ("+P.k+")":""} – Inscription`:"Inscription des clubs";
+  if(!CFG.ready)return fatal("Le formulaire n'est pas encore installé par l'organisation.");
+  if(!CFG.open)return fatal("Les inscriptions sont fermées. Contactez l'organisation du tournoi.");
+  welcome();
+}
+function fatal(m){document.getElementById("app").innerHTML=`<div class="notice err">${esc(m)}</div>`}
+function welcome(){
+  document.getElementById("app").innerHTML=`${P.id?`<div class="notice">Vous inscrivez votre club à la compétition <b>${esc(P.nom)}</b>${P.k?` (catégorie ${esc(P.k)})`:""}.${P.bmin||P.bmax?` Joueurs nés ${P.bmin?"le ou après le "+fmt(P.bmin):""}${P.bmin&&P.bmax?" et ":""}${P.bmax?"le ou avant le "+fmt(P.bmax):""}.`:""}</div>`:""}<div class="panel"><h2>Bienvenue</h2><p>Ce formulaire permet à chaque club d'envoyer directement à l'organisation : les informations du club et son logo, le staff technique (3 personnes) et les kinésithérapeutes (2 personnes) avec leurs photos, et jusqu'à ${CFG.maxPlayers} joueurs avec leur photo et le PDF de leurs pièces justificatives.</p>
+  <p class="small muted">Aucun compte n'est nécessaire. Vous pouvez remplir depuis un téléphone. À la fin, vous recevrez un <b>code club</b> qui vous permettra de compléter ou corriger votre inscription plus tard.</p>
+  <div class="row" style="margin-top:12px"><button class="btn" id="b-new">Nouvelle inscription</button></div></div>
+  <div class="panel"><h2>Modifier une inscription</h2><div class="row"><input id="codein" placeholder="Code club (8 caractères)" maxlength="8" style="max-width:240px;text-transform:uppercase" aria-label="Code club"><button class="btn ghost" id="b-load">Charger mon inscription</button></div><div id="loaderr"></div></div>`;
+  document.getElementById("b-new").onclick=()=>{CODE=null;form()};
+  document.getElementById("b-load").onclick=async()=>{const b=document.getElementById("b-load");b.disabled=true;b.textContent="Chargement…";
+    try{const r=await run("loadClub",document.getElementById("codein").value);CODE=r.code;if(r.comp&&r.comp.id){P={id:r.comp.id,sid:r.comp.sid||P.sid||"",nom:r.comp.nom,bmin:r.comp.bmin||"",bmax:r.comp.bmax||"",k:P.k||""};CFG.birthMin=P.bmin;CFG.birthMax=P.bmax}CAT=r.cat||CAT;
+      D.club=r.club;if(r.club.logoThumb)THUMB["logo:0"]=r.club.logoThumb;
+      D.staff=r.staff.map((s,i)=>{if(s&&s.photoThumb)THUMB[fileKey("staff",i)]=s.photoThumb;return s||{}});while(D.staff.length<5)D.staff.push({});
+      D.players=r.players.map(p=>{p.key=rid();if(p.photoThumb)THUMB[fileKey("player",p.key)]=p.photoThumb;return p});form()}
+    catch(e){document.getElementById("loaderr").innerHTML=`<div class="notice err">${esc(e.message||e)}</div>`;b.disabled=false;b.textContent="Charger mon inscription"}};
+}
+function picHTML(key,label,square,has){const t=THUMB[key];return `<div class="pic"><span class="thumb ${square?"sq":""}" id="th-${key}">${t&&t!=="pdf"?`<img src="${t}" alt="">`:esc(ini(label)||"?")}</span><div class="row"><button type="button" class="btn ghost sm" data-pick="${key}">${t||has?"Changer":"Ajouter"} ${square?"le logo":"la photo"}</button></div><input type="file" accept="image/*" class="hidden" id="f-${key}"></div>`}
+function form(){
+  const c=D.club;
+  document.getElementById("app").innerHTML=`
+  ${CODE?`<div class="notice">Modification de l'inscription <b>${esc(CODE)}</b>. Les fichiers déjà envoyés sont conservés si vous ne les remplacez pas.</div>`:""}
+  <div class="panel"><h2>1. Le club</h2>${picHTML("logo:0",c.sigle||c.nom,true,!!c.logo)}
+   <div class="grid" style="margin-top:12px">
+    <div class="f"><label for="c-cat">Catégorie de l'équipe inscrite *</label><select id="c-cat" ${P.k?"disabled":""}>${CFG.cats.map(x=>`<option ${x===(CAT||"Seniors")?"selected":""}>${x}</option>`).join("")}</select></div>
+    <div class="f"><label for="c-nom">Nom du club *</label><input id="c-nom" maxlength="60" value="${esc(c.nom)}"></div>
+    <div class="f"><label for="c-sigle">Sigle *</label><input id="c-sigle" maxlength="6" style="text-transform:uppercase" value="${esc(c.sigle)}"></div>
+    <div class="f"><label for="c-quartier">Quartier / localité</label><input id="c-quartier" maxlength="60" value="${esc(c.quartier)}"></div>
+    <div class="f"><label for="c-couleur">Couleur principale</label><input id="c-couleur" type="color" value="${esc(c.couleur||"#F2B400")}"></div>
+    <div class="f"><label for="c-resp">Responsable *</label><input id="c-resp" maxlength="60" value="${esc(c.responsable)}"></div>
+    <div class="f"><label for="c-tel">Téléphone *</label><input id="c-tel" type="tel" maxlength="30" value="${esc(c.tel)}"></div>
+    <div class="f"><label for="c-email">E-mail</label><input id="c-email" type="email" maxlength="80" value="${esc(c.email)}"></div>
+   </div></div>
+  <div class="panel"><h2>2. Staff technique et kinésithérapeutes</h2><p class="small muted">3 membres du staff technique et 2 kinésithérapeutes, avec photo.</p><div class="grid">${D.staff.map((s,i)=>`<div class="person"><h3><span>${i<3?"Staff technique "+(i+1):"Kinésithérapeute "+(i-2)}</span></h3>${picHTML(fileKey("staff",i),(s.prenom||"")+" "+(s.nom||""),false,!!s.photo)}
+     <div class="f" style="margin-top:10px"><label for="s-role-${i}">Fonction</label><input id="s-role-${i}" maxlength="40" value="${esc(i>=3?"Kinésithérapeute":(s.role||CFG.roles[i]))}" ${i>=3?"readonly":""}></div>
+     <div class="f"><label for="s-prenom-${i}">Prénoms</label><input id="s-prenom-${i}" maxlength="40" value="${esc(s.prenom)}"></div>
+     <div class="f"><label for="s-nom-${i}">Nom</label><input id="s-nom-${i}" maxlength="40" value="${esc(s.nom)}"></div>
+     <div class="f"><label for="s-tel-${i}">Téléphone</label><input id="s-tel-${i}" type="tel" maxlength="30" value="${esc(s.tel)}"></div>
+     <div class="f"><label for="s-qualif-${i}">Diplôme / qualification</label><input id="s-qualif-${i}" maxlength="60" value="${esc(s.qualif)}"></div></div>`).join("")}</div></div>
+  <div class="panel"><div class="row" style="justify-content:space-between"><h2>3. Joueurs</h2><span class="chip gold" id="pcount"></span></div><p class="small muted">${CFG.birthMin||CFG.birthMax?`Joueurs nés ${CFG.birthMin?"le ou après le "+fmt(CFG.birthMin):""}${CFG.birthMin&&CFG.birthMax?" et ":""}${CFG.birthMax?"le ou avant le "+fmt(CFG.birthMax):""}. `:""}Pour chaque joueur : une photo et un PDF regroupant ses pièces (acte de naissance, pièce d'identité…), 5 Mo maximum.</p>
+   <div class="grid" id="plist"></div><div class="row" style="margin-top:12px"><button class="btn ghost" id="addp">Ajouter un joueur</button></div></div>
+  <div id="msg"></div>`;
+  bindPicks(document.getElementById("app"));renderPlayers();
+  document.getElementById("addp").onclick=()=>{if(D.players.length>=CFG.maxPlayers)return;syncPlayers();D.players.push({key:rid(),poste:"Milieu"});renderPlayers();const l=document.querySelectorAll("#plist .person");l[l.length-1].querySelector("input").focus()};
+  document.getElementById("bar").classList.remove("hidden");document.getElementById("send").textContent=CODE?"Enregistrer les modifications":"Envoyer l'inscription";
+}
+function renderPlayers(){
+  const L=document.getElementById("plist");
+  L.innerHTML=D.players.map((p,i)=>{const k=p.key;const [el,cls]=eligibility(p.naissance);const pdfOk=FILES[fileKey("pdf",k)]||p.pdf;
+    return `<div class="person" data-k="${k}"><h3><span>Joueur ${i+1}</span><button type="button" class="btn danger sm" data-del="${k}">Retirer</button></h3>${picHTML(fileKey("player",k),(p.prenom||"")+" "+(p.nom||""),false,!!p.photo)}
+    <div class="f" style="margin-top:10px"><label>Prénoms *</label><input data-f="prenom" maxlength="40" value="${esc(p.prenom)}"></div>
+    <div class="f"><label>Nom *</label><input data-f="nom" maxlength="40" value="${esc(p.nom)}"></div>
+    <div class="row"><div class="f" style="flex:2"><label>Date de naissance *</label><input data-f="naissance" type="date" value="${esc(p.naissance)}"></div><div class="f" style="flex:1"><label>Maillot *</label><input data-f="maillot" type="number" min="1" max="99" value="${esc(p.maillot)}"></div></div>
+    <div class="row"><div class="f" style="flex:1"><label>Poste</label><select data-f="poste">${POSTES.map(x=>`<option ${p.poste===x?"selected":""}>${x}</option>`).join("")}</select></div><div class="f" style="flex:1"><label>N° pièce d'identité</label><input data-f="piece" maxlength="40" value="${esc(p.piece)}"></div></div>
+    <div class="row" style="margin-top:8px"><span class="chip ${cls}" data-el>${el}</span><span class="chip ${pdfOk?"ok":"gold"}" data-pdfst>${pdfOk?esc((FILES[fileKey("pdf",k)]||{}).name||p.pdfName||"PDF fourni"):"PDF manquant"}</span><button type="button" class="btn ghost sm" data-pdf="${k}">${pdfOk?"Remplacer le PDF":"Ajouter le PDF"}</button><input type="file" accept="application/pdf,.pdf" class="hidden" id="pdf-${k}"></div></div>`}).join("")||`<p class="muted">Aucun joueur pour l'instant.</p>`;
+  document.getElementById("pcount").textContent=`${D.players.length} / ${CFG.maxPlayers}`;
+  document.getElementById("addp").disabled=D.players.length>=CFG.maxPlayers;
+  bindPicks(L);
+  L.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{if(!confirm("Retirer ce joueur ?"))return;syncPlayers();D.players=D.players.filter(p=>p.key!==b.dataset.del);renderPlayers()});
+  L.querySelectorAll('input[data-f="naissance"]').forEach(inp=>inp.oninput=()=>{const [t,c]=eligibility(inp.value);const ch=inp.closest(".person").querySelector("[data-el]");ch.textContent=t;ch.className="chip "+c});
+  L.querySelectorAll("[data-pdf]").forEach(b=>{const k=b.dataset.pdf;const inp=document.getElementById("pdf-"+k);b.onclick=()=>inp.click();
+    inp.onchange=async()=>{const f=inp.files[0];if(!f)return;if(f.size>5*1024*1024){alert("PDF trop lourd : 5 Mo maximum. Réduisez-le (par exemple avec une application de compression PDF) puis réessayez.");inp.value="";return}
+      const h=new Uint8Array(await f.slice(0,5).arrayBuffer());if(String.fromCharCode(...h)!=="%PDF-"){alert("Ce fichier n'est pas un PDF valide.");inp.value="";return}
+      FILES[fileKey("pdf",k)]=f;const st=b.parentNode.querySelector("[data-pdfst]");st.textContent=f.name;st.className="chip ok";b.textContent="Remplacer le PDF"}});
+}
+function bindPicks(root){root.querySelectorAll("[data-pick]").forEach(b=>{const k=b.dataset.pick;const inp=document.getElementById("f-"+k);b.onclick=()=>inp.click();
+  inp.onchange=()=>{const f=inp.files[0];if(!f)return;if(!/^image\//.test(f.type)){alert("Choisissez une image (JPG ou PNG).");return}FILES[k]=f;const u=URL.createObjectURL(f);THUMB[k]=u;document.getElementById("th-"+k).innerHTML=`<img src="${u}" alt="">`;b.textContent="Changer"}})}
+function syncPlayers(){document.querySelectorAll("#plist .person").forEach(el=>{const p=D.players.find(x=>x.key===el.dataset.k);if(!p)return;el.querySelectorAll("[data-f]").forEach(i=>p[i.dataset.f]=i.value.trim())})}
+function collect(){
+  const v=id=>(document.getElementById(id)||{}).value||"";
+  CAT=v("c-cat")||CAT;D.club={...D.club,nom:v("c-nom").trim(),sigle:v("c-sigle").trim().toUpperCase(),quartier:v("c-quartier").trim(),couleur:v("c-couleur"),responsable:v("c-resp").trim(),tel:v("c-tel").trim(),email:v("c-email").trim()};
+  D.staff=D.staff.map((s,i)=>({...s,role:v("s-role-"+i).trim(),prenom:v("s-prenom-"+i).trim(),nom:v("s-nom-"+i).trim(),tel:v("s-tel-"+i).trim(),qualif:v("s-qualif-"+i).trim()}));
+  syncPlayers();
+}
+function validate(){
+  const e=[];const c=D.club;if(!c.nom)e.push("Le nom du club est obligatoire.");if(!c.sigle)e.push("Le sigle est obligatoire.");if(!c.responsable||!c.tel)e.push("Le responsable et son téléphone sont obligatoires.");
+  const seen={};D.players.forEach((p,i)=>{const n=`Joueur ${i+1}`;if(!p.prenom||!p.nom)e.push(`${n} : nom et prénoms obligatoires.`);if(!p.naissance)e.push(`${n} : date de naissance obligatoire.`);else if(eligibility(p.naissance)[1]==="bad")e.push(`${n} : ${eligibility(p.naissance)[0].toLowerCase()}.`);
+    if(!p.maillot)e.push(`${n} : numéro de maillot obligatoire.`);else if(seen[p.maillot])e.push(`${n} : le maillot ${p.maillot} est déjà utilisé.`);seen[p.maillot]=1});
+  if(!D.players.length)e.push("Ajoutez au moins un joueur.");return e;
+}
+function resizeImg(file,max=400){return new Promise((res,rej)=>{const u=URL.createObjectURL(file);const img=new Image();img.onload=()=>{const r=Math.min(1,max/Math.max(img.width,img.height));const c=document.createElement("canvas");c.width=Math.round(img.width*r);c.height=Math.round(img.height*r);const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(u);res(c.toDataURL("image/jpeg",.82).split(",")[1])};img.onerror=()=>rej(new Error("Image illisible : "+file.name));img.src=u})}
+function toB64(f){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(",")[1]);r.onerror=rej;r.readAsDataURL(f)})}
+document.getElementById("send").onclick=async()=>{
+  collect();const msg=document.getElementById("msg");const errs=validate();
+  if(errs.length){msg.innerHTML=`<div class="notice err"><b>À corriger avant l'envoi :</b><br>${errs.map(esc).join("<br>")}</div>`;msg.scrollIntoView({behavior:"smooth"});return}
+  msg.innerHTML="";const btn=document.getElementById("send");btn.disabled=true;
+  const token=rid()+rid();const keys=Object.keys(FILES);let done=0;const prog=document.getElementById("prog"),pt=document.getElementById("progtxt");
+  const step=t=>{pt.textContent=t;prog.style.width=Math.round(100*done/(keys.length+1))+"%"};
+  try{
+    const ids={};
+    for(const k of keys){const f=FILES[k];step(`Envoi des fichiers ${done+1} / ${keys.length}…`);
+      if(k.startsWith("pdf:"))ids[k]=await run("uploadFile",token,f.name,"application/pdf",await toB64(f));
+      else ids[k]=await run("uploadFile",token,f.name.replace(/\.\w+$/,"")+".jpg","image/jpeg",await resizeImg(f));done++}
+    step("Enregistrement de l'inscription…");
+    const payload={comp:P.id?{id:P.id,sid:P.sid||"",nom:P.nom,bmin:P.bmin,bmax:P.bmax}:null,cat:CAT||"U25",nom:D.club.nom,sigle:D.club.sigle,quartier:D.club.quartier,couleur:D.club.couleur,responsable:D.club.responsable,tel:D.club.tel,email:D.club.email,logo:ids["logo:0"]||D.club.logo||null,
+      staff:D.staff.map((s,i)=>({role:s.role,prenom:s.prenom,nom:s.nom,tel:s.tel,qualif:s.qualif,photo:ids[fileKey("staff",i)]||s.photo||null})),
+      players:D.players.map(p=>({id:p.id,prenom:p.prenom,nom:p.nom,naissance:p.naissance,maillot:p.maillot,poste:p.poste,piece:p.piece,photo:ids[fileKey("player",p.key)]||p.photo||null,pdf:ids[fileKey("pdf",p.key)]||p.pdf||null,pdfName:FILES[fileKey("pdf",p.key)]?FILES[fileKey("pdf",p.key)].name:(p.pdfName||"")}))};
+    const r=await run("submitClub",payload,token,CODE);done=keys.length+1;step("Terminé");
+    document.getElementById("bar").classList.add("hidden");
+    document.getElementById("app").innerHTML=`<div class="panel"><h2>Inscription ${CODE?"mise à jour":"envoyée"}</h2><p>Merci ! Les informations du club <b>${esc(D.club.nom)}</b> (${esc(CAT)})${P.id?` pour <b>${esc(P.nom)}</b>`:""} sont arrivées chez l'organisation (${r.players} joueur${r.players>1?"s":""}${r.missingPdf?`, dont ${r.missingPdf} sans PDF des pièces`:""}).</p>
+      <p>Votre <b>code club</b> — notez-le ou faites une capture d'écran : il permet de compléter ou corriger l'inscription.</p><div class="code">${esc(r.code)}</div>
+      <p class="small muted">L'organisation validera votre inscription. Gardez ce code confidentiel : toute personne qui le possède peut modifier l'inscription du club.</p><button class="btn ghost" onclick="location.reload()">Retour à l'accueil</button></div>`;
+    window.scrollTo(0,0);
+  }catch(e){btn.disabled=false;pt.textContent="";prog.style.width="0";msg.innerHTML=`<div class="notice err">L'envoi n'a pas abouti : ${esc(e.message||e)}<br>Vérifiez votre connexion puis réessayez.</div>`;msg.scrollIntoView({behavior:"smooth"})}
+};
+init();
+</script>
+</body>
+</html>

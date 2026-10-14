@@ -1,0 +1,60 @@
+NARX FOOT MANAGER – FORMULAIRE D'INSCRIPTION DES CLUBS (Google)
+Installation : environ 10 minutes, à faire une seule fois par l'organisateur.
+
+1. Ouvrir https://script.google.com avec le compte Google de l'organisation, puis "Nouveau projet".
+   Renommer le projet : "NARX Foot Manager – Inscriptions".
+2. Remplacer tout le contenu du fichier "Code.gs" par le contenu du fichier Code.gs fourni.
+3. Cliquer sur "+" à côté de "Fichiers" > HTML, nommer le fichier exactement : Index
+   Remplacer son contenu par le contenu du fichier Index.html fourni. Enregistrer (Ctrl+S).
+4. Les paramètres de l'édition (année, nombre de clubs, joueurs maximum, dates, ouverture des inscriptions)
+   se règlent dans l'onglet "Paramètres" de la feuille "feuille générale d organisation 2027",
+   déjà créée dans votre Google Drive. Le script est déjà relié à cette feuille.
+5. Dans la liste des fonctions, choisir "setup" puis "Exécuter".
+   Google demande l'autorisation : "Examiner les autorisations" > choisir le compte >
+   "Paramètres avancés" > "Accéder à NARX Foot Manager – Inscriptions (non sécurisé)" > "Autoriser".
+   (Cet avertissement est normal pour un script personnel non publié par Google.)
+   Le journal affiche le lien de la feuille et du dossier Google Drive créé (la feuille y est rangée).
+6. "Déployer" > "Nouveau déploiement" > type "Application Web" :
+     - Exécuter en tant que : Moi
+     - Qui a accès : Tout le monde
+   Cliquer sur "Déployer", copier l'URL de l'application Web (elle se termine par /exec).
+7. Envoyer cette URL aux dirigeants (WhatsApp, SMS, e-mail). Ils remplissent depuis un téléphone
+   ou un ordinateur, sans compte. À la fin, chaque club reçoit un code de 8 caractères pour
+   compléter ou corriger son inscription.
+
+UTILISATION PAR L'ORGANISATION
+- Onglet "Tableau de bord" : places, clubs inscrits, validés, en attente, joueurs, PDF manquants, suivi par club.
+- Onglet "Clubs" : une ligne par club. Colonne "Statut (organisation)" : En attente / Validé / Refusé.
+- Feuilles "Staff" et "Joueurs" : le détail, avec liens vers les photos et PDF dans Google Drive.
+- Les fichiers sont rangés dans Drive : "NARX Foot Manager – Inscriptions" > "Clubs" > un dossier par club.
+  Ils restent privés : seul le compte de l'organisation peut les ouvrir.
+- Fermer les inscriptions : choisir "Fermées" dans l'onglet Paramètres (ou exécuter "fermerInscriptions").
+- Nettoyage : exécuter "nettoyerEnvoisIncomplets" de temps en temps (fichiers d'envois abandonnés).
+
+TRANSFERT VERS L'APPLICATION WINDOWS
+- Marquer les clubs retenus "Validé" dans la feuille Clubs.
+- Exécuter "genererDossiersApplication" : un fichier .ggc-club par club est créé dans Drive,
+  dossier "Dossiers pour l'application".
+- Télécharger ces fichiers, puis dans l'application Windows : Admin > "Importer un dossier club".
+  L'année de l'onglet Paramètres doit être celle de l'édition créée dans l'application.
+
+MODIFIER LE FORMULAIRE PLUS TARD
+- Après toute modification du code : "Déployer" > "Gérer les déploiements" > crayon >
+  Version : "Nouvelle version" > "Déployer". L'URL reste la même.
+
+RÉCUPÉRATION AUTOMATIQUE DES INSCRIPTIONS DANS NARX FOOT MANAGER
+- Version en ligne : rien à installer. Admin → « Récupérer les inscriptions ». La première fois, Claude demande
+  l'autorisation d'utiliser vos connecteurs Google Sheets et Google Drive : acceptez.
+- Application Windows : dans script.google.com, exécutez une fois la fonction « cleSynchronisation » et copiez
+  la clé affichée dans le journal. Dans NARX Foot Manager : Admin → Récupération des inscriptions → Réglages,
+  collez l'adresse du formulaire (…/exec) et la clé. Ensuite, un clic sur « Récupérer les inscriptions » suffit.
+- Les dossiers déjà récupérés et inchangés sont ignorés ; les clubs « Refusé » dans la feuille ne sont pas récupérés.
+
+UNE FEUILLE ET UN DOCUMENT PAR COMPÉTITION
+- À la création d'une compétition dans NARX Foot Manager, un dossier Google Drive est créé à son nom avec :
+  sa propre feuille Google Sheets (Clubs, Staff, Joueurs, Paramètres) et son propre Google Docs (fiche de la compétition
+  avec le lien d'inscription). Le formulaire affiche le nom de la compétition et sa catégorie en titre.
+- Les inscriptions faites avec le lien d'une compétition arrivent dans la feuille de cette compétition.
+- Pour fermer les inscriptions d'une seule compétition : onglet Paramètres de sa feuille, cellule « Inscriptions » = Fermées.
+- Version en ligne : les fichiers sont créés avec vos connecteurs Google Drive et Google Sheets.
+  Application Windows : ils sont créés par le formulaire (adresse …/exec et clé de synchronisation requises).

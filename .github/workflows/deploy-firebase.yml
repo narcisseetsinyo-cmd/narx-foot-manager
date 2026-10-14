@@ -1,0 +1,38 @@
+# Publie le site (web/public) et les règles Firestore sur Firebase à chaque envoi sur « main ».
+# Réglages nécessaires dans GitHub → Settings → Secrets and variables → Actions :
+#   - Variable FIREBASE_PROJECT_ID : identifiant du projet Firebase (ex. narx-foot-manager)
+#   - Secret   FIREBASE_SERVICE_ACCOUNT : contenu complet du fichier JSON du compte de service
+name: Déployer sur Firebase
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+concurrency: firebase-deploy
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Vérifier la configuration
+        id: cfg
+        env:
+          SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          PID: ${{ vars.FIREBASE_PROJECT_ID }}
+        run: |
+          if [ -z "$SA" ] || [ -z "$PID" ]; then
+            echo "::warning::Déploiement ignoré : ajoutez la variable FIREBASE_PROJECT_ID et le secret FIREBASE_SERVICE_ACCOUNT (voir docs/GUIDE-FIREBASE.md)."
+            echo "ok=0" >> "$GITHUB_OUTPUT"
+          else
+            printf '%s' "$SA" > "$RUNNER_TEMP/sa.json"
+            echo "ok=1" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/setup-node@v4
+        if: steps.cfg.outputs.ok == '1'
+        with:
+          node-version: 20
+      - name: Déployer le site et les règles
+        if: steps.cfg.outputs.ok == '1'
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/sa.json
+          PID: ${{ vars.FIREBASE_PROJECT_ID }}
+        run: npx --yes firebase-tools@13 deploy --only hosting,firestore:rules --project "$PID" --non-interactive

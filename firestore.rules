@@ -1,0 +1,49 @@
+rules_version = '2';
+// NARX Foot Manager – règles de sécurité Cloud Firestore
+// - Administration : compte e-mail/mot de passe admin@narx-foot-manager.app (créé dans Firebase Authentication)
+// - Dirigeants : accès anonyme automatique ; chacun ne modifie que SON club (clubreg/<son identifiant>)
+// - Pièces justificatives (PDF) : lisibles uniquement par l'administration et le club concerné
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function isAdmin() {
+      return signedIn()
+        && request.auth.token.email == 'admin@narx-foot-manager.app'
+        && request.auth.token.firebase.sign_in_provider == 'password';
+    }
+    function isOwner(cid) { return signedIn() && request.auth.uid == cid; }
+
+    // Compétitions, matchs, partenaires, réglages : lecture pour tous les utilisateurs connectés, écriture admin
+    match /competitions/{id} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+      match /matches/{m} {
+        allow read: if signedIn();
+        allow write: if isAdmin();
+      }
+    }
+    match /partners/{id} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+    match /settings/{id} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+
+    // Base des clubs : chaque dirigeant gère son propre club et ses photos
+    match /clubreg/{cid} {
+      allow read: if signedIn();
+      allow write: if isAdmin() || isOwner(cid);
+      match /photos/{pid} {
+        allow read: if signedIn();
+        allow write: if isAdmin() || isOwner(cid);
+      }
+    }
+
+    // PDF des pièces : administration et club concerné uniquement
+    match /pieces/{cid}/{rest=**} {
+      allow read, write: if isAdmin() || isOwner(cid);
+    }
+  }
+}

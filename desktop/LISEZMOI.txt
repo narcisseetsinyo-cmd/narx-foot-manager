@@ -1,0 +1,10 @@
+NARX Foot Manager – code source de l application Windows
+
+Pour reconstruire l'installateur sur un PC Windows :
+1. Installer Node.js (version 20 ou plus) depuis https://nodejs.org
+2. Ouvrir une invite de commandes dans ce dossier
+3. npm install
+4. npm run dist
+L'installateur est créé dans le dossier "dist".
+
+Pour tester sans installer : npx electron .
