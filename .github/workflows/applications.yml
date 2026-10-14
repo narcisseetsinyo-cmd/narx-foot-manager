@@ -1,7 +1,7 @@
 # Fabrique toutes les applications à installer et les publie dans « Releases » du dépôt :
 #   - Windows : NARX-Foot-Manager-Setup-<version>.exe
 #   - Mac     : .dmg (puce Apple « arm64 » et Intel « x64 »)
-#   - Android : NARX-Foot-Manager.apk (aussi publié sur le site : /telecharger/NARX-Foot-Manager.apk)
+#   - Android : NARX-Foot-Manager.apk (pour le site : le copier dans web/public/telecharger/ puis l'envoyer sur main)
 # Lancement : onglet Actions → « Applications (Windows, Mac, Android) » → Run workflow.
 name: Applications (Windows, Mac, Android)
 on:
@@ -83,16 +83,3 @@ jobs:
           V=$(node -p "require('./desktop/package.json').version")
           gh release delete "v$V" --yes --cleanup-tag 2>/dev/null || true
           gh release create "v$V" fichiers/* --title "NARX Foot Manager $V" --notes-file docs/INSTALLATION.md
-      - name: Mettre l'APK sur le site
-        run: |
-          mkdir -p web/public/telecharger && cp fichiers/NARX-Foot-Manager.apk web/public/telecharger/
-          git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
-          git add web/public/telecharger/NARX-Foot-Manager.apk
-          git commit -qm "APK Android" && git push || echo "APK inchangé"
-      - name: Publier sur Firebase
-        env: { SA: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' }
-        run: |
-          printf '%s' "$SA" > "$RUNNER_TEMP/sa.json"
-          PID=$(node -p "require('./.firebaserc').projects.default")
-          GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json" npx -y firebase-tools@13 deploy --only hosting --project "$PID" --non-interactive
-          rm -f "$RUNNER_TEMP/sa.json"
