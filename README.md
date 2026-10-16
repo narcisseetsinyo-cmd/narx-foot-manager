@@ -1,7 +1,7 @@
 # NARX Foot Manager
 
 Gestion de tournois et de championnats de football : inscriptions des clubs en ligne, tirage au sort des poules, feuilles de match, classements, suspensions, licences 6 × 4 cm et visuels pour les réseaux sociaux.
-Version **3.11.0** – thème « Nuit bleue ».
+Version **3.12.0** – thème « Nuit bleue ».
 
 ## Contenu du dépôt
 
@@ -13,6 +13,7 @@ Version **3.11.0** – thème « Nuit bleue ».
 | `web/src/firebase-adapter.js` | Branchement de l'application sur Firebase (Firestore + Authentication). |
 | `web/claude/` | Version en ligne d'origine (Claude), source de la version Firebase. |
 | `formulaire-google/` | Formulaire d'inscription des clubs (Google Apps Script : `Code.gs`, `Index.html`). |
+| `tools/patches/` | Ajouts appliqués aux sources (ex. « Message aux clubs » par WhatsApp : `apply_messages.py`). |
 | `tools/build_firebase.py` | Régénère `web/public/app/index.html` à partir de la version Claude. |
 | `firestore.rules` | Règles de sécurité de la base de données. |
 | `docs/GUIDE-FIREBASE.md` | Mise en ligne pas à pas sur Firebase. |

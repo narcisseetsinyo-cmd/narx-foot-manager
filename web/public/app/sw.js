@@ -1,6 +1,6 @@
 /* NARX Foot Manager – service worker : l'application s'ouvre même sans connexion.
    Les données passent par Firestore (cache hors ligne intégré), jamais par ce fichier. */
-const CACHE = "narx-app-v3.11.0";
+const CACHE = "narx-app-v3.12.0";
 const SHELL = ["/app/", "/app/manifest.webmanifest", "/icon-192.png", "/icon-512.png", "/favicon.png"];
 
 self.addEventListener("install", e => {
