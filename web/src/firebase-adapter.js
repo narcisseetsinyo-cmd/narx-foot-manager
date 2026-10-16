@@ -21,7 +21,7 @@
     return fs.doc("organizers/" + u.uid).get().then(function (s) { ORG = s.exists ? Object.assign({ uid: u.uid }, s.data()) : { uid: u.uid, status: "aucune" }; })
       .catch(function (e) { console.warn(e); ORG = { uid: u.uid, status: "erreur" }; });
   };
-  var isApprovedOrg = function () { return !!(ORG && ORG.status === "valide" && isOrgUser()); };
+  var isApprovedOrg = function () { return !!(ORG && ORG.status === "valide" && (+ORG.expiresMs || 0) > Date.now() && isOrgUser()); };
   var ready = new Promise(function (resolve) {
     var done = false;
     auth.onAuthStateChanged(function (u) {
@@ -107,6 +107,11 @@
     },
     orgsListen: function (cb) {
       return fs.collection("organizers").onSnapshot(function (s) { cb(s.docs.map(function (d) { return Object.assign({ uid: d.id }, d.data()); })); }, function (e) { console.warn(e); });
+    },
+    orgRenewRequest: function (formule) {
+      var u = auth.currentUser; if (!u) return Promise.resolve(false);
+      var r = { formule: formule, date: new Date().toISOString() };
+      return fs.doc("organizers/" + u.uid).set({ renouvellement: r }, { merge: true }).then(function () { if (ORG) ORG.renouvellement = r; return true; }).catch(function (e) { console.error(e); return false; });
     },
     orgSet: function (uid, patch) { return fs.doc("organizers/" + uid).set(Object.assign({}, patch, { updatedAt: new Date().toISOString() }), { merge: true }); }
   };

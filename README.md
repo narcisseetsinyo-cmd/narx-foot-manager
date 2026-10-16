@@ -54,6 +54,7 @@ git commit -am "Mise à jour de l'application" && git push
 ## Organisateurs (accès secondaire)
 
 - Un organisateur fait sa demande depuis le site (rubrique **Organisateurs**, lien `/app/#organisateur`) ou depuis l'application : formule **autonome (25 000 FCFA)** ou **accompagnée (50 000 FCFA)**, coordonnées, e-mail et code d'accès personnel (8 caractères minimum).
+- L'accès est valable **1 an (365 jours)** à partir de la validation (champ `expiresMs`, vérifié par `firestore.rules`). À l'échéance, l'organisateur garde ses données mais ne peut plus les modifier ; il demande le renouvellement depuis l'application, et l'administration clique sur **Renouveler 1 an** (la nouvelle année s'ajoute à la date de fin en cours). Un bandeau signale les accès qui expirent dans moins de 30 jours.
 - L'administration voit les demandes dans **Admin → Organisateurs** (et un bandeau sur le tableau de bord), puis **Valide**, **Refuse** ou **Suspend**. Le bouton WhatsApp prévient l'organisateur.
 - Un organisateur validé se connecte avec son e-mail et son code (`/app/#organisateur-connexion`). Il ne voit et ne modifie que ses compétitions, ses clubs et ses partenaires (champ `o` des documents, contrôlé par `firestore.rules`).
 - Formule accompagnée : **Admin → Organisateurs → Gérer ses compétitions** ouvre l'espace de l'organisateur pour y intervenir ; « Revenir aux données NARX » ramène à vos propres données.

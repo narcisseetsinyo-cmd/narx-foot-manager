@@ -195,6 +195,8 @@ ORG_CSS = """
 .offer .tag{justify-self:start;font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;padding:5px 11px;border-radius:99px;background:rgba(156,192,255,.12);color:var(--gold-2)}
 .offer.hl .tag{background:var(--gold);color:#fff}
 .offer p{color:var(--muted)}
+.offer p.valid{display:inline-block;justify-self:start;margin-top:-4px;padding:6px 12px;border-radius:99px;border:1px solid rgba(139,195,74,.4);background:rgba(139,195,74,.08);color:#CFE8B4;font-size:14px}
+.offer p.valid b{color:#fff}
 .offer .btn{justify-content:center;margin-top:4px}
 .howto{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:22px;padding:0;list-style:none;counter-reset:h}
 .howto li{border:1px solid var(--line);border-radius:16px;padding:16px;background:rgba(17,29,66,.55);font-size:15px;color:var(--muted);min-width:0}
@@ -210,19 +212,21 @@ ORG = """<section id="organisateurs" style="padding-top:0">
     <div class="head">
       <p class="eyebrow">Accès organisateur</p>
       <h2>Votre compétition, <span class="accent">vos clubs.</span></h2>
-      <p class="lead">Vous organisez un tournoi ou un championnat ? Obtenez votre propre espace dans NARX Foot Manager : vous y créez votre compétition et vos clubs, avec votre e-mail et votre code d'accès personnel. Vos données restent séparées de celles des autres organisateurs.</p>
+      <p class="lead">Vous organisez un tournoi ou un championnat ? Obtenez votre propre espace dans NARX Foot Manager pour 1 an (365 jours) : vous y créez votre compétition et vos clubs, avec votre e-mail et votre code d'accès personnel. Vos données restent séparées de celles des autres organisateurs.</p>
     </div>
     <div class="offers">
       <div class="offer">
         <span class="tag">Formule autonome</span>
-        <div class="price">25 000<small>FCFA</small></div>
+        <div class="price">25 000<small>FCFA · 1 an</small></div>
+        <p class="valid">Accès valable <b>1 an (365 jours)</b> à partir de la validation</p>
         <p>Pour gérer votre propre compétition <b style="color:var(--fg)">sans l'intervention d'un membre de l'équipe NARX Foot Manager</b>.</p>
         <ul class="ticks"><li>Votre espace et votre code d'accès</li><li>Vos clubs, joueurs, staff et licences</li><li>Tirage, matchs, classements et statistiques</li><li>Visuels de match et messages WhatsApp aux clubs</li></ul>
         <a class="btn btn-line" href="/app/#organisateur">Faire la demande</a>
       </div>
       <div class="offer hl">
         <span class="tag">Formule accompagnée</span>
-        <div class="price">50 000<small>FCFA</small></div>
+        <div class="price">50 000<small>FCFA · 1 an</small></div>
+        <p class="valid">Accès valable <b>1 an (365 jours)</b> à partir de la validation</p>
         <p>Tout ce que propose la formule autonome, <b style="color:var(--fg)">avec l'intervention d'un membre de l'équipe NARX Foot Manager</b> pour vous accompagner dans la gestion de votre compétition.</p>
         <ul class="ticks"><li>Toutes les fonctions de la formule autonome</li><li>Un membre de l'équipe NARX intervient dans votre espace</li><li>Intervention sur vos compétitions, vos clubs et vos matchs</li></ul>
         <a class="btn btn-gold" href="/app/#organisateur">Faire la demande</a>
@@ -231,17 +235,17 @@ ORG = """<section id="organisateurs" style="padding-top:0">
     <ol class="howto">
       <li><b>Faites la demande</b>Sur le site ou dans l'application (Windows, Mac, Android, iPhone), choisissez votre formule et votre code d'accès.</li>
       <li><b>Validation par NARX</b>L'équipe NARX Foot Manager vous contacte et vous communique les modalités de paiement.</li>
-      <li><b>Accès activé</b>Dès la validation, connectez-vous avec votre e-mail et votre code d'accès.</li>
+      <li><b>Accès activé pour 1 an</b>Dès la validation, connectez-vous avec votre e-mail et votre code d'accès. L'accès est valable 365 jours, renouvelable.</li>
       <li><b>Gérez votre compétition</b>Créez vos clubs et votre compétition, puis suivez-la jusqu'à la finale.</li>
     </ol>
-    <p class="small" style="margin-top:18px;color:var(--muted)">Déjà organisateur ? <a href="/app/#organisateur-connexion" style="color:var(--gold-2);font-weight:700">Se connecter à mon espace</a></p>
+    <p class="small" style="margin-top:18px;color:var(--muted)">À l'échéance des 365 jours, vos compétitions et vos clubs sont conservés : renouvelez l'accès (même tarif, pour 1 an) pour continuer à les modifier. Déjà organisateur ? <a href="/app/#organisateur-connexion" style="color:var(--gold-2);font-weight:700">Se connecter à mon espace</a></p>
   </div>
 </section>
 
 """
 sub('<section id="telecharger"', ORG + '<section id="telecharger"')
 sub('<details><summary>Qui peut modifier les compétitions ?</summary><p>Seul l\'administrateur, après avoir saisi le mot de passe. Les dirigeants de club n\'ont accès qu\'à la fiche de leur propre club et à l\'espace de consultation de leurs compétitions.</p></details>',
-    '<details><summary>Qui peut modifier les compétitions ?</summary><p>L\'administration NARX, et chaque organisateur pour ses propres compétitions. Un organisateur ne voit et ne modifie que ses compétitions, ses clubs et ses partenaires. Les dirigeants de club n\'ont accès qu\'à la fiche de leur propre club et à la consultation des compétitions.</p></details>\n      <details><summary>Comment devenir organisateur ?</summary><p>Faites votre demande depuis la rubrique Organisateurs ou dans l\'application : choisissez la formule autonome (25 000 FCFA) ou accompagnée (50 000 FCFA) et votre code d\'accès. L\'équipe NARX Foot Manager vous contacte pour la validation et le paiement, puis votre espace est activé.</p></details>')
+    '<details><summary>Qui peut modifier les compétitions ?</summary><p>L\'administration NARX, et chaque organisateur pour ses propres compétitions. Un organisateur ne voit et ne modifie que ses compétitions, ses clubs et ses partenaires. Les dirigeants de club n\'ont accès qu\'à la fiche de leur propre club et à la consultation des compétitions.</p></details>\n      <details><summary>Comment devenir organisateur ?</summary><p>Faites votre demande depuis la rubrique Organisateurs ou dans l\'application : choisissez la formule autonome (25 000 FCFA) ou accompagnée (50 000 FCFA) et votre code d\'accès. L\'équipe NARX Foot Manager vous contacte pour la validation et le paiement, puis votre espace est activé pour 1 an (365 jours). À l\'échéance, vos données sont conservées et l\'accès se renouvelle pour une nouvelle année.</p></details>')
 
 open(P, 'w').write(h)
 print('ok', len(h))

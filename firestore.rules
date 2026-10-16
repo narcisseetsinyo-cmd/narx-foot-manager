@@ -1,7 +1,8 @@
 rules_version = '2';
 // NARX Foot Manager – règles de sécurité Cloud Firestore
 // - Administration : compte e-mail/mot de passe admin@narx-foot-manager.app (créé dans Firebase Authentication)
-// - Organisateurs (accès secondaire) : compte e-mail + code d'accès, validé par l'administration (organizers/<uid>.status == "valide").
+// - Organisateurs (accès secondaire) : compte e-mail + code d'accès, validé par l'administration (organizers/<uid>.status == "valide"),
+//   pour 1 an (365 jours) : expiresMs = date de fin d'accès en millisecondes.
 //   Un organisateur ne modifie que SES compétitions, SES clubs et SES partenaires (champ « o » = son identifiant).
 // - Dirigeants : accès anonyme automatique ; chacun ne modifie que SON club (clubreg/<son identifiant>)
 // - Pièces justificatives (PDF) : lisibles uniquement par l'administration, le club concerné et son organisateur
@@ -17,7 +18,8 @@ service cloud.firestore {
     function isOrg() {
       return signedIn()
         && exists(/databases/$(database)/documents/organizers/$(request.auth.uid))
-        && get(/databases/$(database)/documents/organizers/$(request.auth.uid)).data.status == 'valide';
+        && get(/databases/$(database)/documents/organizers/$(request.auth.uid)).data.status == 'valide'
+        && request.time.toMillis() < get(/databases/$(database)/documents/organizers/$(request.auth.uid)).data.get('expiresMs', 0);
     }
     // création : le document porte l'identifiant de l'organisateur ; modification : il lui appartient et le reste
     function orgCreate() { return isOrg() && request.resource.data.o == request.auth.uid; }
@@ -72,7 +74,10 @@ service cloud.firestore {
       allow create: if isOwner(uid)
         && ('email' in request.auth.token)
         && request.resource.data.status == 'en_attente';
-      allow update, delete: if isAdmin();
+      // l'organisateur peut seulement demander le renouvellement de son accès
+      allow update: if isAdmin()
+        || (isOwner(uid) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['renouvellement']));
+      allow delete: if isAdmin();
     }
   }
 }
