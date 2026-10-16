@@ -247,5 +247,30 @@ sub('<section id="telecharger"', ORG + '<section id="telecharger"')
 sub('<details><summary>Qui peut modifier les compétitions ?</summary><p>Seul l\'administrateur, après avoir saisi le mot de passe. Les dirigeants de club n\'ont accès qu\'à la fiche de leur propre club et à l\'espace de consultation de leurs compétitions.</p></details>',
     '<details><summary>Qui peut modifier les compétitions ?</summary><p>L\'administration NARX, et chaque organisateur pour ses propres compétitions. Un organisateur ne voit et ne modifie que ses compétitions, ses clubs et ses partenaires. Les dirigeants de club n\'ont accès qu\'à la fiche de leur propre club et à la consultation des compétitions.</p></details>\n      <details><summary>Comment devenir organisateur ?</summary><p>Faites votre demande depuis la rubrique Organisateurs ou dans l\'application : choisissez la formule autonome (25 000 FCFA) ou accompagnée (50 000 FCFA) et votre code d\'accès. L\'équipe NARX Foot Manager vous contacte pour la validation et le paiement, puis votre espace est activé pour 1 an (365 jours). À l\'échéance, vos données sont conservées et l\'accès se renouvelle pour une nouvelle année.</p></details>')
 
+
+# ---------- téléchargements Windows et Mac (dépôt public narx-foot-manager-telechargements) ----------
+DL = 'https://github.com/narcisseetsinyo-cmd/narx-foot-manager-telechargements/releases/latest/download/'
+a = h.index('      <div class="pf">\n        <svg class="os" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.5l7.5-1v7H3z')
+b = h.index('<p class="mono" id="dl-note"')
+apple = re.search(r'<svg class="os"[^>]*><path d="M16\.4 12\.6[^"]*"/></svg>', h).group(0)
+win = re.search(r'<svg class="os"[^>]*><path d="M3 5\.5l7\.5-1v7H3z[^"]*"/></svg>', h).group(0)
+h = h[:a] + f"""      <div class="pf">
+        {win}
+        <h3>Windows</h3><span class="meta">Windows 10 et 11 · 64 bits · .exe</span>
+        <p>Installateur classique avec raccourci sur le bureau. Si Windows affiche « Windows a protégé votre ordinateur » : <b>Informations complémentaires</b> → <b>Exécuter quand même</b>.</p>
+        <a class="btn btn-gold" href="{DL}NARX-Foot-Manager-Windows.exe" download>Télécharger (.exe)</a>
+      </div>
+      <div class="pf">
+        {apple}
+        <h3>Mac</h3><span class="meta">macOS 11 ou plus récent · .dmg</span>
+        <p>Ouvrez le fichier, glissez l'icône dans <b>Applications</b>. Au premier lancement : <b>Réglages Système → Confidentialité et sécurité → Ouvrir quand même</b>. Votre Mac : menu Pomme → À propos de ce Mac.</p>
+        <a class="btn btn-gold" href="{DL}NARX-Foot-Manager-Mac-Apple.dmg" download>Puce Apple (M1–M4)</a>
+        <a class="btn btn-line" href="{DL}NARX-Foot-Manager-Mac-Intel.dmg" download>Processeur Intel</a>
+      </div>
+    </div>
+    """ + h[b:]
+sub('<p class="mono" id="dl-note" style="margin-top:16px;color:var(--muted)"></p>', '<p class="mono" id="dl-note" style="margin-top:16px;color:var(--muted)">Toutes les versions se mettent à jour d\'elles-mêmes et partagent les mêmes données. Sans installer, ouvrez simplement <a href="/app/" style="color:var(--gold-2)">l\'application en ligne</a>.</p>')
+sub('.dl{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}', '.dl{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}') if False else None
+
 open(P, 'w').write(h)
 print('ok', len(h))
