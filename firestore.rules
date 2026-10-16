@@ -1,8 +1,10 @@
 rules_version = '2';
 // NARX Foot Manager – règles de sécurité Cloud Firestore
 // - Administration : compte e-mail/mot de passe admin@narx-foot-manager.app (créé dans Firebase Authentication)
+// - Organisateurs (accès secondaire) : compte e-mail + code d'accès, validé par l'administration (organizers/<uid>.status == "valide").
+//   Un organisateur ne modifie que SES compétitions, SES clubs et SES partenaires (champ « o » = son identifiant).
 // - Dirigeants : accès anonyme automatique ; chacun ne modifie que SON club (clubreg/<son identifiant>)
-// - Pièces justificatives (PDF) : lisibles uniquement par l'administration et le club concerné
+// - Pièces justificatives (PDF) : lisibles uniquement par l'administration, le club concerné et son organisateur
 service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn() { return request.auth != null; }
@@ -12,38 +14,65 @@ service cloud.firestore {
         && request.auth.token.firebase.sign_in_provider == 'password';
     }
     function isOwner(cid) { return signedIn() && request.auth.uid == cid; }
+    function isOrg() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/organizers/$(request.auth.uid))
+        && get(/databases/$(database)/documents/organizers/$(request.auth.uid)).data.status == 'valide';
+    }
+    // création : le document porte l'identifiant de l'organisateur ; modification : il lui appartient et le reste
+    function orgCreate() { return isOrg() && request.resource.data.o == request.auth.uid; }
+    function orgUpdate() { return isOrg() && resource.data.get('o', null) == request.auth.uid && request.resource.data.o == request.auth.uid; }
+    function orgDelete() { return isOrg() && resource.data.get('o', null) == request.auth.uid; }
+    function orgOwns(path) { return isOrg() && exists(path) && get(path).data.get('o', null) == request.auth.uid; }
+    function orgOwnsOrNew(path) { return isOrg() && (!exists(path) || get(path).data.get('o', null) == request.auth.uid); }
 
-    // Compétitions, matchs, partenaires, réglages : lecture pour tous les utilisateurs connectés, écriture admin
+    // Compétitions et matchs : lecture pour tous les utilisateurs connectés
     match /competitions/{id} {
       allow read: if signedIn();
-      allow write: if isAdmin();
+      allow create: if isAdmin() || orgCreate();
+      allow update: if isAdmin() || orgUpdate();
+      allow delete: if isAdmin() || orgDelete();
       match /matches/{m} {
         allow read: if signedIn();
-        allow write: if isAdmin();
+        allow write: if isAdmin() || orgOwns(/databases/$(database)/documents/competitions/$(id));
       }
     }
     match /partners/{id} {
       allow read: if signedIn();
-      allow write: if isAdmin();
+      allow create: if isAdmin() || orgCreate();
+      allow update: if isAdmin() || orgUpdate();
+      allow delete: if isAdmin() || orgDelete();
     }
     match /settings/{id} {
       allow read: if signedIn();
       allow write: if isAdmin();
     }
 
-    // Base des clubs : chaque dirigeant gère son propre club et ses photos
+    // Base des clubs : chaque dirigeant gère son propre club ; un organisateur gère les clubs qu'il a créés
     match /clubreg/{cid} {
       allow read: if signedIn();
-      allow write: if isAdmin() || isOwner(cid);
+      allow create: if isAdmin() || isOwner(cid) || orgCreate();
+      allow update: if isAdmin() || isOwner(cid) || orgUpdate();
+      allow delete: if isAdmin() || isOwner(cid) || orgDelete();
       match /photos/{pid} {
         allow read: if signedIn();
-        allow write: if isAdmin() || isOwner(cid);
+        allow write: if isAdmin() || isOwner(cid) || orgOwnsOrNew(/databases/$(database)/documents/clubreg/$(cid));
       }
     }
 
-    // PDF des pièces : administration et club concerné uniquement
+    // PDF des pièces : administration, club concerné et organisateur du club uniquement
     match /pieces/{cid}/{rest=**} {
-      allow read, write: if isAdmin() || isOwner(cid);
+      allow read, write: if isAdmin() || isOwner(cid) || orgOwnsOrNew(/databases/$(database)/documents/clubreg/$(cid));
+    }
+
+    // Demandes d'accès organisateur
+    match /organizers/{uid} {
+      allow read: if isAdmin() || isOwner(uid);
+      allow list: if isAdmin();
+      allow create: if isOwner(uid)
+        && ('email' in request.auth.token)
+        && request.resource.data.status == 'en_attente';
+      allow update, delete: if isAdmin();
     }
   }
 }

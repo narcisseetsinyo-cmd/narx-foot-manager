@@ -1,7 +1,7 @@
 # NARX Foot Manager
 
 Gestion de tournois et de championnats de football : inscriptions des clubs en ligne, tirage au sort des poules, feuilles de match, classements, suspensions, licences 6 × 4 cm et visuels pour les réseaux sociaux.
-Version **3.12.0** – thème « Nuit bleue ».
+Version **3.13.0** – thème « Nuit bleue ».
 
 ## Contenu du dépôt
 
@@ -10,6 +10,7 @@ Version **3.12.0** – thème « Nuit bleue ».
 | `desktop/` | Application Windows et Mac (Electron) : affiche les données partagées en ligne, avec un mode « données de cet ordinateur ». |
 | `android/` | Application Android (Trusted Web Activity) ; clé de signature `narx-release.jks` (à conserver, nécessaire aux mises à jour). |
 | `web/public/` | Site publié sur Firebase Hosting : site de présentation (`/`) et application en ligne (`/app/`). |
+| `web/src/organisateurs.js` | Accès organisateur (2ᵉ niveau d'administration) : demandes, validation, espace propre à chaque organisateur. |
 | `web/src/firebase-adapter.js` | Branchement de l'application sur Firebase (Firestore + Authentication). |
 | `web/claude/` | Version en ligne d'origine (Claude), source de la version Firebase. |
 | `formulaire-google/` | Formulaire d'inscription des clubs (Google Apps Script : `Code.gs`, `Index.html`). |
@@ -49,3 +50,13 @@ git commit -am "Mise à jour de l'application" && git push
 
 - L'administration est protégée par le mot de passe administrateur (empreinte SHA-256 dans le code) et, sur Firebase, par le compte `admin@narx-foot-manager.app`.
 - Le dépôt doit rester **privé**. Ne jamais y ajouter le fichier JSON du compte de service Google.
+
+## Organisateurs (accès secondaire)
+
+- Un organisateur fait sa demande depuis le site (rubrique **Organisateurs**, lien `/app/#organisateur`) ou depuis l'application : formule **autonome (25 000 FCFA)** ou **accompagnée (50 000 FCFA)**, coordonnées, e-mail et code d'accès personnel (8 caractères minimum).
+- L'administration voit les demandes dans **Admin → Organisateurs** (et un bandeau sur le tableau de bord), puis **Valide**, **Refuse** ou **Suspend**. Le bouton WhatsApp prévient l'organisateur.
+- Un organisateur validé se connecte avec son e-mail et son code (`/app/#organisateur-connexion`). Il ne voit et ne modifie que ses compétitions, ses clubs et ses partenaires (champ `o` des documents, contrôlé par `firestore.rules`).
+- Formule accompagnée : **Admin → Organisateurs → Gérer ses compétitions** ouvre l'espace de l'organisateur pour y intervenir ; « Revenir aux données NARX » ramène à vos propres données.
+- Le numéro WhatsApp NARX qui reçoit les demandes se règle dans **Admin → Organisateurs**.
+- Code oublié : « Code oublié ? » envoie un e-mail de réinitialisation (Firebase Authentication).
+- Fonction réservée à la version en ligne (site, Android, iPhone, et Windows/Mac en mode « Données partagées »).

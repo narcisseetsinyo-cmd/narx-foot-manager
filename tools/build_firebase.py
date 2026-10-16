@@ -60,6 +60,11 @@ h = h.replace('<title>NARX Foot Manager</title>', '<title>NARX Foot Manager · A
 # 8) Installation (iPhone, Android, ordinateur) : service worker pour l'ouverture hors connexion
 if not test:
     h = h.replace('</body>', '<script>if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("/app/sw.js",{scope:"/app/"}).catch(()=>{}));</script>\n</body>', 1)
+
+# 9) Organisateurs (accès secondaire) : demandes, validation, espace propre à chaque organisateur
+org = open(os.path.join(here, '..', 'web', 'src', 'organisateurs.js')).read()
+sub('async function loadNames(', org + '\nasync function loadNames(')
+h = h.replace('</head>', '<style>.org-mode [data-act=comp-link],.org-mode [data-act=lic-saison]{display:none!important}.orgg{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0 14px}</style>\n</head>', 1)
 assert 'NARX_FB' in h
 open(out, 'w').write(h)
 print('ok', out, len(h))

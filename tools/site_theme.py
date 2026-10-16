@@ -73,6 +73,8 @@ h3{font-size:clamp(22px,2.2vw,28px);letter-spacing:-.025em}
 .brand b span{color:var(--fg)}
 .nav .btn{font-size:14.5px;padding:9px 16px;white-space:nowrap}
 .nav ul{gap:20px}
+@media (max-width:1240px){.nav ul{gap:14px}.nav ul a{font-size:14px}}
+@media (max-width:1120px){.nav ul li.opt{display:none}}
 .hero::before{background:radial-gradient(60% 70% at 85% 10%,rgba(61,123,247,.40),transparent 70%),radial-gradient(40% 50% at 0% 100%,rgba(212,59,59,.10),transparent 70%)}
 .hero::after{background:repeating-linear-gradient(115deg,transparent 0 120px,rgba(156,192,255,.04) 120px 122px)}
 .plat{font-size:13.5px;font-weight:600}
@@ -128,9 +130,9 @@ h3{font-size:clamp(22px,2.2vw,28px);letter-spacing:-.025em}
 sub('</style>', THEME + '</style>')
 
 # ---------- textes ----------
-h = h.replace('Version 3.11.0', 'Version 3.12.0')
-sub('Gestion de tournois et championnats · Version 3.12.0', 'Tournois et championnats · Version 3.12.0')
-sub('<li><a href="#assistant">Assistant</a></li>', '<li><a href="#messages">Messages</a></li>\n      <li><a href="#assistant">Assistant</a></li>')
+h = h.replace('Version 3.11.0', 'Version 3.13.0')
+sub('Gestion de tournois et championnats · Version 3.13.0', 'Tournois et championnats · Version 3.13.0')
+sub('<li><a href="#assistant">Assistant</a></li>', '<li><a href="#messages">Messages</a></li>')
 sub('<a class="btn btn-line" href="#telecharger">Windows et Mac</a>', '<a class="btn btn-line" href="#telecharger">Installer l\'application</a>')
 sub('<div class="plat"><span>Windows</span><span>macOS</span><span>Navigateur web</span><span>Téléphone</span></div>',
     '<div class="plat"><span>Windows</span><span>macOS</span><span>Android</span><span>iPhone</span><span>Navigateur web</span></div>')
@@ -177,6 +179,69 @@ sub('<section id="assistant"', MSG + '<section id="assistant"')
 # ---------- FAQ ----------
 sub('<details><summary>Que faut-il pour imprimer les licences ?</summary>',
     '<details><summary>Les messages WhatsApp partent-ils tout seuls ?</summary><p>Presque : l\'application prépare le message personnalisé et ouvre WhatsApp sur la bonne conversation, il ne reste qu\'à appuyer sur Envoyer. Un envoi 100 % automatique demande l\'offre payante WhatsApp Business de Meta. Les numéros utilisés sont ceux des fiches des clubs, visibles uniquement par l\'administration.</p></details>\n      <details><summary>Que faut-il pour imprimer les licences ?</summary>')
+
+
+
+sub('      <li><a href="#deroule">Déroulé</a></li>\n', '')
+sub('<li><a href="#licences">Licences</a></li>', '<li class="opt"><a href="#licences">Licences</a></li>')
+sub('<li><a href="#faq">Questions</a></li>', '<li class="opt"><a href="#faq">Questions</a></li>')
+# ---------- organisateurs : accès secondaire ----------
+ORG_CSS = """
+.offers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.offer{border:1px solid var(--line);border-radius:22px;padding:28px;background:var(--navy);display:grid;gap:14px;align-content:start;min-width:0}
+.offer.hl{border-color:var(--gold);background:linear-gradient(170deg,rgba(61,123,247,.20),var(--navy) 55%);box-shadow:var(--glow)}
+.offer .price{font-family:var(--f-display);font-weight:800;font-size:clamp(40px,4.6vw,56px);letter-spacing:-.04em;line-height:1}
+.offer .price small{font-family:var(--f-body);font-size:16px;font-weight:700;letter-spacing:0;color:var(--muted);margin-left:6px}
+.offer .tag{justify-self:start;font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;padding:5px 11px;border-radius:99px;background:rgba(156,192,255,.12);color:var(--gold-2)}
+.offer.hl .tag{background:var(--gold);color:#fff}
+.offer p{color:var(--muted)}
+.offer .btn{justify-content:center;margin-top:4px}
+.howto{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:22px;padding:0;list-style:none;counter-reset:h}
+.howto li{border:1px solid var(--line);border-radius:16px;padding:16px;background:rgba(17,29,66,.55);font-size:15px;color:var(--muted);min-width:0}
+.howto li b{display:block;color:var(--fg);margin-bottom:4px}
+.howto li::before{counter-increment:h;content:"0" counter(h);display:block;font-weight:800;font-size:12.5px;letter-spacing:.18em;color:var(--gold-2);margin-bottom:8px}
+@media (max-width:860px){.offers{grid-template-columns:minmax(0,1fr)}.howto{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:480px){.howto{grid-template-columns:minmax(0,1fr)}}
+"""
+sub('</style>', ORG_CSS + '</style>')
+sub('<li><a href="#telecharger">Télécharger</a></li>', '<li><a href="#organisateurs">Organisateurs</a></li>\n      <li><a href="#telecharger">Télécharger</a></li>')
+ORG = """<section id="organisateurs" style="padding-top:0">
+  <div class="wrap">
+    <div class="head">
+      <p class="eyebrow">Accès organisateur</p>
+      <h2>Votre compétition, <span class="accent">vos clubs.</span></h2>
+      <p class="lead">Vous organisez un tournoi ou un championnat ? Obtenez votre propre espace dans NARX Foot Manager : vous y créez votre compétition et vos clubs, avec votre e-mail et votre code d'accès personnel. Vos données restent séparées de celles des autres organisateurs.</p>
+    </div>
+    <div class="offers">
+      <div class="offer">
+        <span class="tag">Formule autonome</span>
+        <div class="price">25 000<small>FCFA</small></div>
+        <p>Pour gérer votre propre compétition <b style="color:var(--fg)">sans l'intervention d'un membre de l'équipe NARX Foot Manager</b>.</p>
+        <ul class="ticks"><li>Votre espace et votre code d'accès</li><li>Vos clubs, joueurs, staff et licences</li><li>Tirage, matchs, classements et statistiques</li><li>Visuels de match et messages WhatsApp aux clubs</li></ul>
+        <a class="btn btn-line" href="/app/#organisateur">Faire la demande</a>
+      </div>
+      <div class="offer hl">
+        <span class="tag">Formule accompagnée</span>
+        <div class="price">50 000<small>FCFA</small></div>
+        <p>Tout ce que propose la formule autonome, <b style="color:var(--fg)">avec l'intervention d'un membre de l'équipe NARX Foot Manager</b> pour vous accompagner dans la gestion de votre compétition.</p>
+        <ul class="ticks"><li>Toutes les fonctions de la formule autonome</li><li>Un membre de l'équipe NARX intervient dans votre espace</li><li>Intervention sur vos compétitions, vos clubs et vos matchs</li></ul>
+        <a class="btn btn-gold" href="/app/#organisateur">Faire la demande</a>
+      </div>
+    </div>
+    <ol class="howto">
+      <li><b>Faites la demande</b>Sur le site ou dans l'application (Windows, Mac, Android, iPhone), choisissez votre formule et votre code d'accès.</li>
+      <li><b>Validation par NARX</b>L'équipe NARX Foot Manager vous contacte et vous communique les modalités de paiement.</li>
+      <li><b>Accès activé</b>Dès la validation, connectez-vous avec votre e-mail et votre code d'accès.</li>
+      <li><b>Gérez votre compétition</b>Créez vos clubs et votre compétition, puis suivez-la jusqu'à la finale.</li>
+    </ol>
+    <p class="small" style="margin-top:18px;color:var(--muted)">Déjà organisateur ? <a href="/app/#organisateur-connexion" style="color:var(--gold-2);font-weight:700">Se connecter à mon espace</a></p>
+  </div>
+</section>
+
+"""
+sub('<section id="telecharger"', ORG + '<section id="telecharger"')
+sub('<details><summary>Qui peut modifier les compétitions ?</summary><p>Seul l\'administrateur, après avoir saisi le mot de passe. Les dirigeants de club n\'ont accès qu\'à la fiche de leur propre club et à l\'espace de consultation de leurs compétitions.</p></details>',
+    '<details><summary>Qui peut modifier les compétitions ?</summary><p>L\'administration NARX, et chaque organisateur pour ses propres compétitions. Un organisateur ne voit et ne modifie que ses compétitions, ses clubs et ses partenaires. Les dirigeants de club n\'ont accès qu\'à la fiche de leur propre club et à la consultation des compétitions.</p></details>\n      <details><summary>Comment devenir organisateur ?</summary><p>Faites votre demande depuis la rubrique Organisateurs ou dans l\'application : choisissez la formule autonome (25 000 FCFA) ou accompagnée (50 000 FCFA) et votre code d\'accès. L\'équipe NARX Foot Manager vous contacte pour la validation et le paiement, puis votre espace est activé.</p></details>')
 
 open(P, 'w').write(h)
 print('ok', len(h))
