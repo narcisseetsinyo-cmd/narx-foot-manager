@@ -83,3 +83,17 @@ jobs:
           V=$(node -p "require('./desktop/package.json').version")
           gh release delete "v$V" --yes --cleanup-tag 2>/dev/null || true
           gh release create "v$V" fichiers/* --title "NARX Foot Manager $V" --notes-file docs/INSTALLATION.md
+      - name: Publier les téléchargements publics (dépôt narx-foot-manager-telechargements)
+        env:
+          PUB: '${{ secrets.PUBLIC_RELEASE_TOKEN }}'
+          PUB_REPO: '${{ github.repository_owner }}/narx-foot-manager-telechargements'
+        run: |
+          if [ -z "$PUB" ]; then echo "::warning::Secret PUBLIC_RELEASE_TOKEN absent : téléchargements publics non publiés."; exit 0; fi
+          V=$(node -p "require('./desktop/package.json').version")
+          mkdir -p pub
+          cp fichiers/NARX-Foot-Manager-Setup-*.exe pub/NARX-Foot-Manager-Windows.exe
+          cp fichiers/NARX-Foot-Manager-*-mac-x64.dmg pub/NARX-Foot-Manager-Mac-Intel.dmg
+          cp fichiers/NARX-Foot-Manager-*-mac-arm64.dmg pub/NARX-Foot-Manager-Mac-Apple.dmg
+          printf 'NARX Foot Manager %s\n\n- Windows 10 et 11 : NARX-Foot-Manager-Windows.exe\n- Mac Intel : NARX-Foot-Manager-Mac-Intel.dmg\n- Mac puce Apple (M1 à M4) : NARX-Foot-Manager-Mac-Apple.dmg\n\nMode d emploi : https://narx-foot-manager.web.app/#telecharger\n' "$V" > pub-notes.txt
+          GH_TOKEN="$PUB" gh release delete "v$V" -R "$PUB_REPO" --yes --cleanup-tag 2>/dev/null || true
+          GH_TOKEN="$PUB" gh release create "v$V" pub/* -R "$PUB_REPO" --title "NARX Foot Manager $V" --notes-file pub-notes.txt --latest
