@@ -1999,10 +1999,10 @@ function msgModal(){
   <div class="f"><label for="msgtpl">Modèle</label><select id="msgtpl">${MSG_MODELES.map(([k,l])=>`<option value="${k}">${esc(l)}</option>`).join("")}</select></div>
   <div class="f"><label for="msgtxt">Message</label><textarea id="msgtxt" rows="7" maxlength="3000" placeholder="Votre message…" style="display:block;width:100%;box-sizing:border-box;resize:vertical;font:inherit"></textarea>
   <div class="small muted" style="margin-top:6px">Remplacés automatiquement : <b>{club}</b>, <b>{responsable}</b>, <b>{competition}</b>, <b>{lien}</b> (lien d'inscription).</div></div>
-  <div class="two"><div class="f"><label for="msgwho">Destinataires</label><select id="msgwho"><option value="tous">Tous les clubs inscrits</option><option value="valides">Clubs validés uniquement</option></select></div>
-  <div class="f"><label for="msgind">Indicatif par défaut</label><input id="msgind" type="text" inputmode="numeric" maxlength="4" value="${esc(msgIndicatif())}"></div></div>
+  <div class="two" style="grid-template-columns:minmax(0,1fr) 120px"><div class="f" style="min-width:0"><label for="msgwho">Destinataires</label><select id="msgwho"><option value="tous">Tous les inscrits</option><option value="valides">Clubs validés uniquement</option></select></div>
+  <div class="f"><label for="msgind">Indicatif</label><input id="msgind" type="text" inputmode="numeric" maxlength="4" value="${esc(msgIndicatif())}"></div></div>
   <div class="row" style="justify-content:space-between;margin:6px 0 10px"><b id="msgcount"></b><div class="row"><a class="btn" id="msgnext" target="_blank" rel="noopener noreferrer">Envoyer au club suivant</a><button type="button" class="btn ghost sm" id="msgnums">Copier les numéros</button></div></div>
-  <div id="msglist" style="display:grid;gap:8px"></div>`,null,(root)=>{
+  <div id="msglist" style="display:grid;grid-template-columns:minmax(0,1fr);gap:8px"></div>`,null,(root)=>{
     const $q=s=>root.querySelector(s);
     const list=()=>msgRecipients().filter(r=>st.who==="tous"||r.valide);
     const link=r=>`https://wa.me/${r.num}?text=${encodeURIComponent(msgFill(st.txt,r))}`;
@@ -2011,10 +2011,10 @@ function msgModal(){
       const nx=ok.find(r=>!sent.has(r.num));const b=$q("#msgnext");
       if(nx&&st.txt.trim()){b.href=link(nx);b.dataset.num=nx.num;b.textContent=`Envoyer à ${nx.sigle||nx.nom}`;b.removeAttribute("aria-disabled")}
       else{b.removeAttribute("href");b.dataset.num="";b.setAttribute("aria-disabled","true");b.textContent=!st.txt.trim()?"Écrivez d'abord le message":"Tous les messages sont partis"}
-      $q("#msglist").innerHTML=L.length?L.map(r=>`<div class="row" style="justify-content:space-between;flex-wrap:nowrap;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:12px">
-        <div class="row" style="flex-wrap:nowrap;min-width:0">${crest(r.c,"sm")}<div style="min-width:0"><div style="font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.nom)}${r.cat?` <span class="small muted">· ${esc(r.cat)}</span>`:""}</div>
+      $q("#msglist").innerHTML=L.length?L.map(r=>`<div class="row" style="justify-content:space-between;flex-wrap:nowrap;gap:10px;min-width:0;padding:10px 12px;border:1px solid var(--line);border-radius:12px">
+        <div class="row" style="flex-wrap:nowrap;min-width:0;flex:1">${crest(r.c,"sm")}<div style="min-width:0"><div style="font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.nom)}${r.cat?` <span class="small muted">· ${esc(r.cat)}</span>`:""}</div>
         <div class="small muted">${r.num?`+${esc(r.num)}${r.responsable?" · "+esc(r.responsable):""}`:"Aucun numéro : ajoutez le téléphone du club"}${r.valide?"":" · en attente"}</div></div></div>
-        ${r.num?(sent.has(r.num)?`<a class="btn ghost sm" data-wa="${r.num}" href="${esc(link(r))}" target="_blank" rel="noopener noreferrer">Envoyé ✓</a>`:`<a class="btn sm" data-wa="${r.num}" ${st.txt.trim()?`href="${esc(link(r))}"`:'aria-disabled="true"'} target="_blank" rel="noopener noreferrer">WhatsApp</a>`):""}</div>`).join(""):`<div class="empty"><h3>Aucun club inscrit</h3><p>Ajoutez des participants à la compétition.</p></div>`};
+        ${r.num?(sent.has(r.num)?`<a class="btn ghost sm" style="flex-shrink:0" data-wa="${r.num}" href="${esc(link(r))}" target="_blank" rel="noopener noreferrer">Envoyé ✓</a>`:`<a class="btn sm" style="flex-shrink:0" data-wa="${r.num}" ${st.txt.trim()?`href="${esc(link(r))}"`:'aria-disabled="true"'} target="_blank" rel="noopener noreferrer">WhatsApp</a>`):""}</div>`).join(""):`<div class="empty"><h3>Aucun club inscrit</h3><p>Ajoutez des participants à la compétition.</p></div>`};
     const mark=num=>{if(num){MSGSENT[id].add(num);setTimeout(paint,50)}};
     root.addEventListener("click",e=>{const a=e.target.closest("[data-wa],#msgnext");if(!a)return;if(!a.getAttribute("href")){e.preventDefault();if(!st.txt.trim())toast("Écrivez d'abord le message.");return}mark(a.dataset.wa||a.dataset.num)});
     $q("#msgtpl").addEventListener("change",e=>{const m=MSG_MODELES.find(x=>x[0]===e.target.value);if(m&&m[2]){$q("#msgtxt").value=m[2];st.txt=m[2];MSGSENT[id]=new Set();paint()}});
